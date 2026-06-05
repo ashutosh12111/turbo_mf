@@ -1,0 +1,13 @@
+{
+  "root": true,
+  "extends": ["next/core-web-vitals", "next/typescript"],
+  "rules": {
+    "@next/next/no-html-link-for-pages": "off"
+  },
+  "settings": {
+    "react": {
+      "version": "18.3"
+    }
+  },
+  "ignorePatterns": ["node_modules/", ".next/", ".turbo/", "**/next-env.d.ts"]
+}

@@ -1,0 +1,11 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+onlyBuiltDependencies:
+  - "@module-federation/nextjs-mf"
+  - "esbuild"
+  - "sharp"
+
+overrides:
+  enhanced-resolve: "5.18.1"

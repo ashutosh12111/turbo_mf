@@ -1,0 +1,29 @@
+{
+  "name": "@repo/ui",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint src --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@emotion/react": "11.14.0",
+    "@emotion/styled": "11.14.1",
+    "@mui/icons-material": "9.0.1",
+    "@mui/material": "9.0.1",
+    "@repo/movies": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.30",
+    "eslint": "8.57.1",
+    "react": "18.3.1",
+    "typescript": "5.9.3"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1"
+  }
+}
