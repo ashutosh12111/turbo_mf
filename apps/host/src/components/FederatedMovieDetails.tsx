@@ -13,11 +13,10 @@ type MountStatus = "loading" | "ready" | "error";
 
 export function FederatedMovieDetails({ movieId }: FederatedMovieDetailsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const handleRef = useRef<MovieDetailsMountHandle>();
+  const handleRef = useRef<MovieDetailsMountHandle | undefined>(undefined);
   const movieIdRef = useRef(movieId);
   const [status, setStatus] = useState<MountStatus>("loading");
-
-  movieIdRef.current = movieId;
+  const [error, setError] = useState<string>();
 
   useEffect(() => {
     const element = containerRef.current;
@@ -39,8 +38,13 @@ export function FederatedMovieDetails({ movieId }: FederatedMovieDetailsProps) {
         });
         setStatus("ready");
       })
-      .catch(() => {
+      .catch((loadError: unknown) => {
         if (!isCancelled) {
+          setError(
+            loadError instanceof Error
+              ? loadError.message
+              : "Unknown remote loading error.",
+          );
           setStatus("error");
         }
       });
@@ -53,6 +57,7 @@ export function FederatedMovieDetails({ movieId }: FederatedMovieDetailsProps) {
   }, []);
 
   useEffect(() => {
+    movieIdRef.current = movieId;
     handleRef.current?.update({ movieId });
   }, [movieId]);
 
@@ -62,7 +67,7 @@ export function FederatedMovieDetails({ movieId }: FederatedMovieDetailsProps) {
       {status === "error" ? (
         <Alert severity="error">
           Movie details remote is unavailable. Confirm that its app is running
-          and reload the page.
+          and reload the page. {error ? `Details: ${error}` : null}
         </Alert>
       ) : null}
       <Box

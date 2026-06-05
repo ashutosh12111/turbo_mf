@@ -1,7 +1,29 @@
 const DEFAULT_MOVIES_API_BASE_URL = "https://ghibliapi.vercel.app";
 
+type RuntimeEnv = Record<string, string | undefined>;
+
+function readNodeEnv(): RuntimeEnv | undefined {
+  const maybeGlobal = globalThis as typeof globalThis & {
+    process?: {
+      env?: RuntimeEnv;
+    };
+  };
+
+  return maybeGlobal.process?.env;
+}
+
+function readViteEnv(): RuntimeEnv | undefined {
+  const meta = import.meta as ImportMeta & {
+    env?: RuntimeEnv;
+  };
+
+  return meta.env;
+}
+
 export const MOVIES_API_BASE_URL =
-  process.env.NEXT_PUBLIC_MOVIES_API_BASE_URL ?? DEFAULT_MOVIES_API_BASE_URL;
+  readViteEnv()?.VITE_MOVIES_API_BASE_URL ??
+  readNodeEnv()?.VITE_MOVIES_API_BASE_URL ??
+  DEFAULT_MOVIES_API_BASE_URL;
 
 interface StudioGhibliFilm {
   id: string;
@@ -32,6 +54,10 @@ export interface Movie {
   runningTimeMinutes: number;
   score: number;
 }
+
+export const MOVIE_SELECTED_EVENT = "movie-mf:movie-selected";
+
+export type MovieSelectedEvent = CustomEvent<Movie>;
 
 export class MoviesApiError extends Error {
   constructor(

@@ -4,12 +4,12 @@ import InputAdornment from "@mui/material/InputAdornment";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { getMovies, type Movie } from "@repo/movies";
+import { getMovies, MOVIE_SELECTED_EVENT, type Movie } from "@repo/movies";
 import { LoadingMovieGrid, MovieCard } from "@repo/ui";
 import { useEffect, useMemo, useState } from "react";
 
 const movieViewAppUrl =
-  process.env.NEXT_PUBLIC_MOVIE_VIEW_APP_URL ?? "http://localhost:3002";
+  import.meta.env.VITE_MOVIE_VIEW_APP_URL ?? "http://localhost:3002";
 
 export interface MovieListProps {
   onSelectMovie?: (movie: Movie) => void;
@@ -61,7 +61,20 @@ export default function MovieList({ onSelectMovie }: MovieListProps) {
     );
   }, [movies, query]);
 
+  const dispatchMovieSelection = (movie: Movie) => {
+    const event = new CustomEvent<Movie>(MOVIE_SELECTED_EVENT, {
+      cancelable: true,
+      detail: movie,
+    });
+
+    return window.dispatchEvent(event);
+  };
+
   const handleSelectMovie = (movie: Movie) => {
+    if (!dispatchMovieSelection(movie)) {
+      return;
+    }
+
     if (onSelectMovie) {
       onSelectMovie(movie);
       return;

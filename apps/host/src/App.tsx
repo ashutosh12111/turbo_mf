@@ -6,14 +6,17 @@ import Chip from "@mui/material/Chip";
 import Container from "@mui/material/Container";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import type { Movie } from "@repo/movies";
+import {
+  MOVIE_SELECTED_EVENT,
+  type Movie,
+  type MovieSelectedEvent,
+} from "@repo/movies";
 import { Header } from "@repo/ui";
-import Head from "next/head";
-import { useCallback, useRef, useState } from "react";
-import { FederatedMovieDetails } from "../components/FederatedMovieDetails";
-import { FederatedMovieList } from "../components/FederatedMovieList";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { FederatedMovieDetails } from "./components/FederatedMovieDetails";
+import { FederatedMovieList } from "./components/FederatedMovieList";
 
-export default function HomePage() {
+export default function App() {
   const [selectedMovieId, setSelectedMovieId] = useState<string>();
   const detailsRef = useRef<HTMLDivElement>(null);
 
@@ -27,15 +30,22 @@ export default function HomePage() {
     });
   }, []);
 
+  useEffect(() => {
+    const handleRemoteMovieSelection = (event: Event) => {
+      event.preventDefault();
+      handleSelectMovie((event as MovieSelectedEvent).detail);
+    };
+
+    window.addEventListener(MOVIE_SELECTED_EVENT, handleRemoteMovieSelection);
+    return () =>
+      window.removeEventListener(
+        MOVIE_SELECTED_EVENT,
+        handleRemoteMovieSelection,
+      );
+  }, [handleSelectMovie]);
+
   return (
     <>
-      <Head>
-        <title>Ghibli Shelf | Federated Movies</title>
-        <meta
-          content="A Next.js and Module Federation movie catalog built with Turborepo."
-          name="description"
-        />
-      </Head>
       <Header
         appName="Ghibli Shelf"
         links={[
@@ -57,14 +67,14 @@ export default function HomePage() {
               <Chip
                 color="secondary"
                 icon={<AutoAwesomeRoundedIcon />}
-                label="Three apps, one movie shelf"
+                label="Three Vite apps, one movie shelf"
                 variant="outlined"
               />
               <Typography component="h1" variant="h1">
                 Discover the films. See the federation boundaries.
               </Typography>
               <Typography color="text.secondary" variant="h6">
-                The shell composes a movie list from one Next.js remote and a
+                The shell composes a movie list from one Vite remote and a
                 details panel from another. Shared cards, headers, theme, and
                 API types live in workspace packages.
               </Typography>
@@ -84,7 +94,7 @@ export default function HomePage() {
                   Movie list remote
                 </Typography>
                 <Typography color="text.secondary">
-                  Served independently by the app running on port 3001.
+                  Served independently by the Vite app running on port 3001.
                 </Typography>
               </Box>
               <FederatedMovieList onSelectMovie={handleSelectMovie} />
@@ -101,7 +111,7 @@ export default function HomePage() {
                   Movie details remote
                 </Typography>
                 <Typography color="text.secondary">
-                  Served independently by the app running on port 3002.
+                  Served independently by the Vite app running on port 3002.
                 </Typography>
               </Box>
               <FederatedMovieDetails movieId={selectedMovieId} />

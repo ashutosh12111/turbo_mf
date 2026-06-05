@@ -1,6 +1,7 @@
 node_modules
 .next
 .turbo
+@mf-types
 dist
 coverage
 .DS_Store

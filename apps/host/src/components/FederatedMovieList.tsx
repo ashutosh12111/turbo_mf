@@ -14,6 +14,7 @@ type MountStatus = "loading" | "ready" | "error";
 export function FederatedMovieList({ onSelectMovie }: FederatedMovieListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<MountStatus>("loading");
+  const [error, setError] = useState<string>();
 
   useEffect(() => {
     const element = containerRef.current;
@@ -35,8 +36,13 @@ export function FederatedMovieList({ onSelectMovie }: FederatedMovieListProps) {
         unmount = handle.unmount;
         setStatus("ready");
       })
-      .catch(() => {
+      .catch((loadError: unknown) => {
         if (!isCancelled) {
+          setError(
+            loadError instanceof Error
+              ? loadError.message
+              : "Unknown remote loading error.",
+          );
           setStatus("error");
         }
       });
@@ -53,7 +59,7 @@ export function FederatedMovieList({ onSelectMovie }: FederatedMovieListProps) {
       {status === "error" ? (
         <Alert severity="error">
           Movie list remote is unavailable. Confirm that its app is running and
-          reload the page.
+          reload the page. {error ? `Details: ${error}` : null}
         </Alert>
       ) : null}
       <Box
